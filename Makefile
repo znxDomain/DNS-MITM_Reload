@@ -42,6 +42,9 @@ BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
+APP_VERSION :=  v0.0.2
+APP_AUTHOR  :=  znxDomain
+
 #ROMFS	:=	romfs
 
 #---------------------------------------------------------------------------------
