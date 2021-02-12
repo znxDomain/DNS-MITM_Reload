@@ -55,6 +55,9 @@ int main(int argc, char* argv[])
             
             serviceClose(&g_sfdnsresSrv);
             printf("serviceClosed");
+            
+            printf("\n\nDNS MITM hosts file reloaded.\n");
+
         }
 
         // Your code goes here
