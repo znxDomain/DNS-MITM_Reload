@@ -3,62 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-
 // Include the main libnx system header, for Switch development
 #include <switch.h>
 
 static Service g_sfdnsresSrv;
-
-void libnx_getaddrinfo(const char *hostname, const char *port)
-{
-    socketInitializeDefault();
-
-    struct addrinfo hints, *res, *p;
-    int status;
-    char ipstr[INET6_ADDRSTRLEN];
-
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_INET; // AF_INET or AF_INET6 to force version
-    hints.ai_socktype = SOCK_STREAM;
-
-    printf("\n\nCalling getaddrinfo hostname: \"%s\" port \"%s\":\n", hostname, port);
-
-    if ((status = getaddrinfo(hostname, port, &hints, &res)) != 0) {
-        printf("ERR getaddrinfo: %s, error nr: %d\n", gai_strerror(status), status);
-    }
-
-    printf("IP addresses for %s:\n", hostname);
-
-    for(p = res;p != NULL; p = p->ai_next) {
-        void *addr;
-        char *ipver;
-
-        // get the pointer to the address itself,
-        // different fields in IPv4 and IPv6:
-        if (p->ai_family == AF_INET) { // IPv4
-            struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
-            addr = &(ipv4->sin_addr);
-            ipver = "IPv4";
-        } else { // IPv6
-            struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
-            addr = &(ipv6->sin6_addr);
-            ipver = "IPv6";
-        }
-
-        // convert the IP to a string and print it:
-        inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
-        printf("  %s: %s\n", ipver, ipstr);
-    }
-
-    freeaddrinfo(res); // free the linked list
-    socketExit();
-}
-
 
 // Main program entrypoint
 int main(int argc, char* argv[])
@@ -96,12 +44,7 @@ int main(int argc, char* argv[])
             break; // break in order to return to hbmenu
 
         if (kDown & HidNpadButton_X){
-            char hostname[] = "switchbrew.org";
-            char port[] = "80";
-
             Result rc = 0;
-            libnx_getaddrinfo(hostname, port);
-
             printf("\n\nStarting Reload.\n");
 
             rc = smGetService(&g_sfdnsresSrv, "sfdnsres");
@@ -112,9 +55,6 @@ int main(int argc, char* argv[])
             
             serviceClose(&g_sfdnsresSrv);
             printf("serviceClosed");
-
-            libnx_getaddrinfo(hostname, port);
-
         }
 
         // Your code goes here
